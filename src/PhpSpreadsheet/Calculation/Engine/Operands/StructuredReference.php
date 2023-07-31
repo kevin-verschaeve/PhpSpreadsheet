@@ -55,7 +55,6 @@ final class StructuredReference implements Operand
 
     public static function fromParser(string $formula, int $index, array $matches): self
     {
-        dd('fork');
         $val = $matches[0];
 
         $srCount = substr_count($val, self::OPEN_BRACE)
