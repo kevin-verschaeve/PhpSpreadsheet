@@ -144,13 +144,27 @@ final class StructuredReference implements Operand
      */
     private function getTableByName(Cell $cell): Table
     {
-        $table = $cell->getWorksheet()->getTableByName($this->tableName);
+        $table = $cell->getWorksheet()->getTableByName($this->tableName) ?? $this->findTableFromOtherSheets($cell);
 
         if ($table === null) {
             throw new Exception("Table {$this->tableName} for Structured Reference cannot be located");
         }
 
         return $table;
+    }
+
+    private function findTableFromOtherSheets(Cell $cell): ?Table
+    {
+        $spreadsheet = $cell->getWorksheet()->getParentOrThrow();
+
+        foreach ($spreadsheet->getAllSheets() as $sheet) {
+            $table = $sheet->getTableByName($this->tableName);
+            if (null !== $table) {
+                return $table;
+            }
+        }
+
+        return null;
     }
 
     private function getColumns(Cell $cell, array $tableRange): array
